@@ -1,0 +1,32 @@
+.table {
+    margin: auto;
+    margin-top: 50px;
+    border-collapse: collapse;
+    display: none;
+    text-align: center;
+    border: 1px solid #aeaeae;
+}
+
+.table td, th {
+    padding: 10px 15px;
+}
+
+.table th {
+    background: black;
+    color: white;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f1f1f1
+}
+
+
+
+.loading {
+    width: 100%;
+    margin-top: 50px;
+    text-align: center;
+    display:none;
+}
