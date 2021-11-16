@@ -1,4 +1,8 @@
-const calculateAge = ({Birth, Death}) => {
+const getAge = (name) => {
+    return fetch(`https://tomsen.dev/FlowFormaAPI/getdate/${name}`).then(res => res.json());
+}
+
+const calculateAge = ({ Birth, Death }) => {
     const birth = new Date(Birth);
     const death = Death === null ? new Date() : new Date(Death);
     let age = death.getFullYear() - birth.getFullYear();
@@ -14,14 +18,13 @@ const fetchData = async () => {
     let loading = document.querySelector(".loading");
     loading.style.display = 'block';
     let people = [];
-    const firstFetch = await fetch("https://tomsen.dev/FlowFormaAPI/names");
-    const names = await firstFetch.json();
-    const secondFetch = await fetch("https://tomsen.dev/FlowFormaAPI/tech");
-    const tech = await secondFetch.json();
+    const [names, tech] = await Promise.all([
+        fetch("https://tomsen.dev/FlowFormaAPI/names").then(res => res.json()),
+        fetch("https://tomsen.dev/FlowFormaAPI/tech").then(res => res.json())
+    ]);
+    const ages = await Promise.all(names.map(name => getAge(name)));
     for (let i = 0; i < names.length; i++) {
-        const thirdFetch = await fetch(`https://tomsen.dev/FlowFormaAPI/getdate/${names[i]}`);
-        const dates = await thirdFetch.json();
-        const age = calculateAge(dates);
+        const age = calculateAge(ages[i]);
         people[i] = {
             name: names[i],
             tech: tech[i],
@@ -43,14 +46,14 @@ const fetchData = async () => {
 
 const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
 
-const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
     v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
 document.querySelectorAll('#table th').forEach(th => th.addEventListener('click', (() => {
     const table = document.querySelector("#table")
     Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
         .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-        .forEach(tr => table.appendChild(tr) );
+        .forEach(tr => table.appendChild(tr));
 })));
 
 fetchData();
